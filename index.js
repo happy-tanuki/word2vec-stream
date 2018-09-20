@@ -1,6 +1,6 @@
 const fs = require('fs');
 const Stream = require('stream');
-const MAX_STRING = 100;
+const MAX_STRING = 300;
 
 /**
  * streamBinaryModel
@@ -26,6 +26,7 @@ function streamBinaryModel(binpath) {
       if (wordBuffer===null) return;
                     
       let word = wordBuffer.toString().split(' ')[0];
+      const word_length = wordBuffer.indexOf(' ');
 
       if (!word || word.length===0) {
         // we must have eaten a dead space at beginning
@@ -35,7 +36,7 @@ function streamBinaryModel(binpath) {
 
       const values = new Float32Array(size);
                   
-      off += word.length + 1;
+      off += word_length + 1;
       for (let i = 0; i < size; i++) {
         try {
           values[i] = wordBuffer.readFloatLE(off);
@@ -54,7 +55,7 @@ function streamBinaryModel(binpath) {
       }
         
       // we read too much, push remainder back onto stack
-      const actualLength = word.length + 1 + size * 4;
+      const actualLength = word_length + 1 + size * 4;
       if (actualLength < wordBuffer.length) {
           instream.unshift(wordBuffer.slice(actualLength));
       }
